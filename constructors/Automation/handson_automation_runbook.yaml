@@ -1,0 +1,46 @@
+description: Automation hands-on document.
+schemaVersion: '0.3'
+parameters:
+  Commands:
+    description: runCommand - 実行するCommands
+    type: StringList
+  WorkingDirectory:
+    description: runCommand - working directory
+    type: String
+    default: ''
+  ExecutionTimeout:
+    description: runCommand - timeout seconds
+    type: String
+    default: '7200'
+  TargetResourceGroupName:
+    description: The name of the Resource Group to target.
+    type: String
+  OutputS3BucketName:
+    description: runCommand - output bucket Name
+    type: String
+  OutputS3KeyPrefix:
+    description: runCommand - output file prefix
+    type: String
+
+#outputs:
+#  - runCommand.InstanceIds
+
+mainSteps:
+  - name: runCommand
+    action: 'aws:runCommand'
+    description: This command runs the Command document on the specified instances.
+    inputs:
+      DocumentName: AWS-RunShellScript
+      Targets:
+        - Key: 'resource-groups:Name'
+          Values:
+            - '{{ TargetResourceGroupName }}'
+      Parameters:
+        commands: '{{ Commands }}'
+        workingDirectory: '{{ WorkingDirectory }}'
+        executionTimeout: '{{ ExecutionTimeout }}'
+      CloudWatchOutputConfig:
+        CloudWatchOutputEnabled: true
+      OutputS3BucketName: '{{ OutputS3BucketName }}'
+      OutputS3KeyPrefix: run-shell
+    timeoutSeconds: 7200
